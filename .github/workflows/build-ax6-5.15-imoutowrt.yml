@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: OpenWrt-AX3600-boos+(K5.15)
+name: Build AX6 OpenWRT (K5.15-imoutowrt)
 
 on:
   repository_dispatch:
@@ -20,12 +20,12 @@ on:
         default: 'false'
 
 env:
-  REPO_URL: https://github.com/saocdr/boosopenwrt 
+  REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: configs/ax3600-boos-5.15+.config
+  CONFIG_FILE: configs/AX6-5.15.config
   DIY_P1_SH: diy-part1.sh
-  DIY_P2_SH: diy-part2-AX3600.sh
+  DIY_P2_SH: diy-part2-ax6.sh
   USE_CACHEWRTBUILD: true
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -34,7 +34,9 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    # if: github.event.repository.owner.id == github.event.sender.id
+
     steps:
     - name: Checkout
       uses: actions/checkout@main
@@ -54,7 +56,7 @@ jobs:
         echo "-----------------------------硬盘信息---------------------------------------------"
         echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
         echo "硬盘详情："
-        df -Th
+        df -Th     
 
     - name: Initialization environment
       env:
@@ -80,7 +82,6 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
         df -Th
  
-
     - name: Clone source code
       working-directory: /workdir
       run: |
@@ -179,7 +180,7 @@ jobs:
       id: tag
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"AX3600-boos-K5.15.%Y.%m.%d-%H%M")" >>$GITHUB_OUTPUT
+        echo "release_tag=$(date +"AX6-K5.15-imoutowrt.%Y.%m.%d-%H%M")" >>$GITHUB_OUTPUT
         touch release.txt
         echo "status=success" >>$GITHUB_OUTPUT
 
